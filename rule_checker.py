@@ -2,9 +2,42 @@ import pandas
 import itertools
 
 #user defined function definitions
-def case_compare(datafile,attribute,value,concept,decision):
-	print(data.iloc[:,0])
-
+def case_compare(data,attribute,value,concept,decision):
+	flag = 0
+	k = 0
+	identified = [] #to store the cases that havebeen identified by the rule
+	row = data.shape[0]
+	column = data.shape[1]
+	len1 = len(attribute)
+	new_header = data.iloc[0] #grab the first row for the header
+	data = data[1:] #take the data less the header row
+	data.columns = new_header #set the header row as the df header
+	headerlist = list(data.columns.values) #to get the headers of the table
+	header_list_length = len(headerlist) #length of the headerlist
+	
+	#checking each case if being matched by the rule completely
+	for index, row in data.iterrows():
+		k=0
+		for item in attribute:
+			if(row[item] == value[k] or row[item] == '*' or row[item] == '-' ):
+				flag = 1
+				k = k+1
+			else:
+				flag = 0
+				break
+		
+		if(flag == 1):
+			dec = data.iloc[index-2,header_list_length-1]
+			if(dec == decision[0]):
+				identified.append(index-2)
+			
+		
+	for j in identified:
+		for k in range(0,header_list_length):
+			print(data.iloc[j,k], end=' ')
+		print("\n")
+	
+#Execution begins
 rname = input('Enter Rule filename: ')
 
 # Open the Rule file with read only permit
@@ -27,8 +60,8 @@ attribute = [] #list to store the attributes
 value = [] #list to store the values
 concept = [] #list to store the concepts
 decision = [] #list to store the decision values
-rule_left_conditions = []
-rule_left_con = []
+rule_left_conditions = [] #to store the conditions
+rule_left_con = [] #to store conditions after stripping brackets
 
 data.drop(data.index[0],inplace=True)
 data.iloc[0] = data.iloc[0].replace('[','') #remove leading bracket from first row
@@ -37,8 +70,6 @@ data.iloc[0] = data.iloc[0].replace(']','') #remove trailing bracket from first 
 rownum_old = data.shape[0] #to get the rowcount
 colnum_old = data.shape[1] #to get the column count
 
-#print(rownum_old)
-#print(colnum_old)
 
 for i in range(0,colnum_old-1):
 	data.iloc[0,i] = data.iloc[0, i+1]
@@ -88,11 +119,12 @@ for x in lines:
 			sep1 = u.split(",")
 			attribute.append(sep1[0])
 			value.append(sep1[1])
-		#print(attribute)
-		#print(value)
-		#print("..........")
+		
 		#call the function for checking cases
+
+		print("\n\nCases matched: ")
 		case_compare(data,attribute,value,concept,decision)
+		
 		rule_left = [] #list to store the left parts of the Rules
 		rule_right = [] #list to store the right parts of the Rules
 		attribute = [] #list to store the attributes
@@ -109,4 +141,3 @@ print("\n\nThe total number of cases: ", rownum-1)
 print("\nThe total number of Attributes: ", colnum-1)
 print("\nThe total number of Rules: ", rulecount)
 print("\nThe total number of Conditions: ", no_of_conditions)
-
