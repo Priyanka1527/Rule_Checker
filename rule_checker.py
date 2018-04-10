@@ -1,12 +1,15 @@
 import pandas
 import itertools
 
+
+
 #user defined function definitions
 def case_compare(data,attribute,value,concept,decision):
 	flag = 0
 	k = 0
-	classified_correct = [] #to store the cases that have been correctly classified
-	classified_incorrect = [] #to store the cases that have been incorrectly classified
+	global complete_total_correct, complete_total_incorrect
+	complete_classified_correct = [] #to store the cases that have been correctly classified
+	complete_classified_incorrect = [] #to store the cases that have been incorrectly classified
 	classified_not = [] #to store the cases that have not been classified
 	row = data.shape[0]
 	column = data.shape[1]
@@ -31,20 +34,25 @@ def case_compare(data,attribute,value,concept,decision):
 		if(flag == 1):
 			dec = data.iloc[index-2,header_list_length-1]
 			if(dec == decision[0]):
-				classified_correct.append(index-2)
+				complete_classified_correct.append(index-2)
+				complete_total_correct = complete_total_correct + 1
+				print(complete_total_correct)
 			else:
-				classified_incorrect.append(index-2)
+				complete_classified_incorrect.append(index-2)
+				complete_total_incorrect = complete_total_incorrect + 1
 
 		else:
 			classified_not.append(index-2)
+
+	#-----print the list of cases---------		
 		
 	#print("\n\nCorrectly classified: ")	
-	#for j in classified_correct:
-		#print("Case: ", j, " ")
-		#for k in range(0,header_list_length):
-			#print(data.iloc[j,k], end=' ')
-		#print("\n")
-	print("\nTotal number of cases that are Correctly classified: ", len(classified_correct))
+	#for j in complete_classified_correct:
+	#	print("Case: ", j+1, " ")
+	#	for k in range(0,header_list_length):
+	#		print(data.iloc[j,k], end=' ')
+	#	print("\n")
+	#print("\nTotal number of cases that are Correctly classified: ", len(complete_classified_correct))
 
 
 	#print("\n\nIncorrectly classified: ")
@@ -53,7 +61,7 @@ def case_compare(data,attribute,value,concept,decision):
 	#	for k in range(0,header_list_length):
 	#		print(data.iloc[j,k], end=' ')
 	#	print("\n")
-	print("\nTotal number of cases that are Incorrectly classified: ", len(classified_incorrect))
+	#print("\nTotal number of cases that are Incorrectly classified: ", len(classified_incorrect))
 
 
 	#print("\n\nNot classified: ")
@@ -62,7 +70,7 @@ def case_compare(data,attribute,value,concept,decision):
 	#	for k in range(0,header_list_length):
 	#		print(data.iloc[j,k], end=' ')
 	#	print("\n")
-	print("\nTotal number of cases that are Not classified: ", len(classified_not))
+	#print("\nTotal number of cases that are Not classified: ", len(classified_not))
 	
 #Execution begins
 rname = input('Enter Rule filename: ')
@@ -108,6 +116,9 @@ data.dropna(axis=1, how='any',inplace=True) #drop all the columns having any NaN
 rownum = data.shape[0] #No. of Rows in the dataframe
 colnum = data.shape[1] #No. of Columns in the dataframe
 
+global complete_total_correct, complete_total_incorrect
+complete_total_correct = 0
+complete_total_incorrect = 0
 #Looping through the lines of the Rule file
 for x in lines:
 	if x.startswith('!') or x.startswith('\n') or x.startswith(('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')): #ignore the lines starting with !, \n and nos
@@ -149,7 +160,7 @@ for x in lines:
 		
 		#call the function for checking cases
 
-		print("\n\nCases matched: ")
+		#print("\n\nCases matched: ")
 		case_compare(data,attribute,value,concept,decision)
 		
 		rule_left = [] #list to store the left parts of the Rules
@@ -161,10 +172,13 @@ for x in lines:
 		rule_left_conditions = []
 		rule_left_con = []
 
-					
+			
 #printing statements
 print("\n\n----This report was created from the Rule file", rname, "and from the Data file", fname, "----")
 print("\n\nThe total number of cases: ", rownum-1)
 print("\nThe total number of Attributes: ", colnum-1)
 print("\nThe total number of Rules: ", rulecount)
 print("\nThe total number of Conditions: ", no_of_conditions)
+print("\n\nCOMPLETE MATCHING: ")
+print("\nThe total number of cases that are incorrectly classified: ", complete_total_incorrect)
+print("\nThe total number of cases that are correctly classified: ", complete_total_correct)
