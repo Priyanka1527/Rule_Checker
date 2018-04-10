@@ -5,7 +5,9 @@ import itertools
 def case_compare(data,attribute,value,concept,decision):
 	flag = 0
 	k = 0
-	identified = [] #to store the cases that havebeen identified by the rule
+	classified_correct = [] #to store the cases that have been correctly classified
+	classified_incorrect = [] #to store the cases that have been incorrectly classified
+	classified_not = [] #to store the cases that have not been classified
 	row = data.shape[0]
 	column = data.shape[1]
 	len1 = len(attribute)
@@ -29,13 +31,38 @@ def case_compare(data,attribute,value,concept,decision):
 		if(flag == 1):
 			dec = data.iloc[index-2,header_list_length-1]
 			if(dec == decision[0]):
-				identified.append(index-2)
-			
+				classified_correct.append(index-2)
+			else:
+				classified_incorrect.append(index-2)
+
+		else:
+			classified_not.append(index-2)
 		
-	for j in identified:
-		for k in range(0,header_list_length):
-			print(data.iloc[j,k], end=' ')
-		print("\n")
+	#print("\n\nCorrectly classified: ")	
+	#for j in classified_correct:
+		#print("Case: ", j, " ")
+		#for k in range(0,header_list_length):
+			#print(data.iloc[j,k], end=' ')
+		#print("\n")
+	print("\nTotal number of cases that are Correctly classified: ", len(classified_correct))
+
+
+	#print("\n\nIncorrectly classified: ")
+	#for j in classified_incorrect:
+	#	print("Case: ", j, " ")
+	#	for k in range(0,header_list_length):
+	#		print(data.iloc[j,k], end=' ')
+	#	print("\n")
+	print("\nTotal number of cases that are Incorrectly classified: ", len(classified_incorrect))
+
+
+	#print("\n\nNot classified: ")
+	#for j in classified_not:
+	#	print("Case: ", j, " ")
+	#	for k in range(0,header_list_length):
+	#		print(data.iloc[j,k], end=' ')
+	#	print("\n")
+	print("\nTotal number of cases that are Not classified: ", len(classified_not))
 	
 #Execution begins
 rname = input('Enter Rule filename: ')
