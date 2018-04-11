@@ -36,7 +36,7 @@ def case_compare(data,attribute,value,concept,decision):
 			if(dec == decision[0]):
 				complete_classified_correct.append(index-2)
 				complete_total_correct = complete_total_correct + 1
-				print(complete_total_correct)
+				
 			else:
 				complete_classified_incorrect.append(index-2)
 				complete_total_incorrect = complete_total_incorrect + 1
@@ -97,6 +97,9 @@ concept = [] #list to store the concepts
 decision = [] #list to store the decision values
 rule_left_conditions = [] #to store the conditions
 rule_left_con = [] #to store conditions after stripping brackets
+specificity = []
+strength = []
+matchcase = []
 
 data.drop(data.index[0],inplace=True)
 data.iloc[0] = data.iloc[0].replace('[','') #remove leading bracket from first row
@@ -121,8 +124,14 @@ complete_total_correct = 0
 complete_total_incorrect = 0
 #Looping through the lines of the Rule file
 for x in lines:
-	if x.startswith('!') or x.startswith('\n') or x.startswith(('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')): #ignore the lines starting with !, \n and nos
+	if x.startswith('!') or x.startswith('\n'): #ignore the lines starting with !, \n and nos
 		pass
+	elif x.startswith(('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')):
+		
+		numberstr = [a.strip() for a in x.split(',')]
+		specificity.append(numberstr[0])
+		strength.append(numberstr[1])
+		matchcase.append(numberstr[2])
 	else:
 		rulecount+=1
 		rulesep = x.split("->") #rulesep array's first location contains the left side of the Rule and second location contains the right side
@@ -182,3 +191,6 @@ print("\nThe total number of Conditions: ", no_of_conditions)
 print("\n\nCOMPLETE MATCHING: ")
 print("\nThe total number of cases that are incorrectly classified: ", complete_total_incorrect)
 print("\nThe total number of cases that are correctly classified: ", complete_total_correct)
+print("Specificity: ", specificity)
+print("Strength: ", strength)
+print("Number of matching Training cases: ", matchcase)
