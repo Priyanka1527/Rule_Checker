@@ -6,7 +6,6 @@ import itertools
 #user defined function definitions
 def case_compare(data,attribute,value,concept,decision):
 	flag = 0
-	k = 0
 	global complete_total_correct, complete_total_incorrect
 	complete_classified_correct = [] #to store the cases that have been correctly classified
 	complete_classified_incorrect = [] #to store the cases that have been incorrectly classified
@@ -24,12 +23,23 @@ def case_compare(data,attribute,value,concept,decision):
 	for index, row in data.iterrows():
 		k=0
 		for item in attribute:
-			if(row[item] == value[k] or row[item] == '*' or row[item] == '-' ):
-				flag = 1
-				k = k+1
+			if(".." in value[k]): #checking ifthe value is numerical interval
+				value_range = value[k].split("..")
+				value_left = value_range[0]
+				value_right = value_range[1]
+				if(value_left <= row[item] <=  value_right or row[item] == '*' or row[item] == '-' ): #The closed interval range is considered while checking
+					flag = 1
+					k = k+1
+				else:
+					flag = 0
+					break
 			else:
-				flag = 0
-				break
+				if(row[item] == value[k] or row[item] == '*' or row[item] == '-' ):
+					flag = 1
+					k = k+1
+				else:
+					flag = 0
+					break
 		
 		if(flag == 1):
 			dec = data.iloc[index-2,header_list_length-1]
@@ -166,9 +176,9 @@ for x in lines:
 			sep1 = u.split(",")
 			attribute.append(sep1[0])
 			value.append(sep1[1])
+			
 		
 		#call the function for checking cases
-
 		#print("\n\nCases matched: ")
 		case_compare(data,attribute,value,concept,decision)
 		
