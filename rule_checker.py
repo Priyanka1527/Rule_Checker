@@ -142,9 +142,24 @@ for x in lines:
 		specificity.append(numberstr[0])
 		strength.append(numberstr[1])
 		matchcase.append(numberstr[2])
-	else:
+	elif(x.startswith('(')):
 		rulecount+=1
-		rulesep = x.split("->") #rulesep array's first location contains the left side of the Rule and second location contains the right side
+		if("->" not in x):
+			l = (lines.index(x))+1
+			l2 = lines[l]
+			l2 = l2.strip()
+			x = x+l2
+			
+			rulesep = x.split("->") #rulesep array's first location contains the left side of the Rule and second location contains the right side
+			#print(rulesep)
+
+			#rule_left.append(rulesep[0]) #updating the Left side of the rules
+			#rule_right.append(rulesep[1]) #updating the Right side of the rules
+
+		elif("->" in x):
+
+			rulesep = x.split("->") #rulesep array's first location contains the left side of the Rule and second location contains the right side
+			#print(rulesep)
 
 		rule_left.append(rulesep[0]) #updating the Left side of the rules
 		rule_right.append(rulesep[1]) #updating the Right side of the rules
@@ -201,6 +216,6 @@ print("\nThe total number of Conditions: ", no_of_conditions)
 print("\n\nCOMPLETE MATCHING: ")
 print("\nThe total number of cases that are incorrectly classified: ", complete_total_incorrect)
 print("\nThe total number of cases that are correctly classified: ", complete_total_correct)
-print("Specificity: ", specificity)
-print("Strength: ", strength)
-print("Number of matching Training cases: ", matchcase)
+#print("Specificity: ", specificity)
+#print("Strength: ", strength)
+#print("Number of matching Training cases: ", matchcase)
