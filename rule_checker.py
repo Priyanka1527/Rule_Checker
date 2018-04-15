@@ -6,10 +6,11 @@ import itertools
 #user defined function definitions
 def case_compare(data,attribute,value,concept,decision):
 	flag = 0
-	global complete_total_correct, complete_total_incorrect
-	complete_classified_correct = [] #to store the cases that have been correctly classified
-	complete_classified_incorrect = [] #to store the cases that have been incorrectly classified
-	classified_not = [] #to store the cases that have not been classified
+	
+	global complete_classified_correct, complete_classified_incorrect, classified_not
+	#complete_classified_correct = [] #to store the cases that have been correctly classified
+	#complete_classified_incorrect = [] #to store the cases that have been incorrectly classified
+	#classified_not = [] #to store the cases that have not been classified
 	row = data.shape[0]
 	column = data.shape[1]
 	len1 = len(attribute)
@@ -21,6 +22,7 @@ def case_compare(data,attribute,value,concept,decision):
 	
 	#checking each case if being matched by the rule completely
 	for index, row in data.iterrows():
+		
 		k=0
 		for item in attribute:
 			if(".." in value[k]): #checking ifthe value is numerical interval
@@ -45,14 +47,17 @@ def case_compare(data,attribute,value,concept,decision):
 			dec = data.iloc[index-2,header_list_length-1]
 			if(dec == decision[0]):
 				complete_classified_correct.append(index-2)
-				complete_total_correct = complete_total_correct + 1
+				
 				
 			else:
 				complete_classified_incorrect.append(index-2)
-				complete_total_incorrect = complete_total_incorrect + 1
+				
 
 		else:
 			classified_not.append(index-2)
+	
+
+		
 
 	#-----print the list of cases---------		
 		
@@ -76,7 +81,7 @@ def case_compare(data,attribute,value,concept,decision):
 
 	#print("\n\nNot classified: ")
 	#for j in classified_not:
-	#	print("Case: ", j, " ")
+	#	print("Case: ", j+1, " ")
 	#	for k in range(0,header_list_length):
 	#		print(data.iloc[j,k], end=' ')
 	#	print("\n")
@@ -129,9 +134,11 @@ data.dropna(axis=1, how='any',inplace=True) #drop all the columns having any NaN
 rownum = data.shape[0] #No. of Rows in the dataframe
 colnum = data.shape[1] #No. of Columns in the dataframe
 
-global complete_total_correct, complete_total_incorrect
-complete_total_correct = 0
-complete_total_incorrect = 0
+
+global complete_classified_correct, complete_classified_incorrect, classified_not
+complete_classified_correct = []
+complete_classified_incorrect = []
+classified_not = []
 #Looping through the lines of the Rule file
 for x in lines:
 	if x.startswith('!') or x.startswith('\n'): #ignore the lines starting with !, \n and nos
@@ -206,16 +213,32 @@ for x in lines:
 		rule_left_conditions = []
 		rule_left_con = []
 
-			
+classified_not = [x for x in classified_not if x not in complete_classified_correct]
+classified_not = [x for x in classified_not if x not in complete_classified_incorrect]
+
+classified_not = list(set(classified_not))
+complete_classified_correct_nodup = list(set(complete_classified_correct))
+complete_classified_incorrect_nodup = list(set(complete_classified_incorrect))
+
+response_match_factor = input('Do you want to use the Matching Factor (y/n): ')
+response_strenfth_prob = input('Do you want to use Strength (s) or Conditional PRobability (p): ')
+response_specificity = input('Do you want to use the factor associated with Specificity (y/n): ')
+response_support = input('Do you want to use the support of other rules or not (y/n): ')
+response_concept_stat = input('Do you want to know the Concept Statistics (y/n): ')
+response_classified = input('Do you want to know how Cases associated with Concepts are Classified (y/n): ')
+
 #printing statements
+print("\n\n-----------!!! General Statistics !!!-------------")
 print("\n\n----This report was created from the Rule file", rname, "and from the Data file", fname, "----")
 print("\n\nThe total number of cases: ", rownum-1)
 print("\nThe total number of Attributes: ", colnum-1)
 print("\nThe total number of Rules: ", rulecount)
 print("\nThe total number of Conditions: ", no_of_conditions)
+print("\nThe total number of cases that are NOT classified: ", len(classified_not))
 print("\n\nCOMPLETE MATCHING: ")
-print("\nThe total number of cases that are incorrectly classified: ", complete_total_incorrect)
-print("\nThe total number of cases that are correctly classified: ", complete_total_correct)
+print("\nThe total number of cases that are incorrectly classified: ", len(complete_classified_incorrect_nodup))
+print("\nThe total number of cases that are correctly classified: ", len(complete_classified_correct_nodup))
+
 #print("Specificity: ", specificity)
 #print("Strength: ", strength)
 #print("Number of matching Training cases: ", matchcase)
