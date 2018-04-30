@@ -1,16 +1,16 @@
+#Author: Priyanka Saha
+
 import pandas
 import itertools
-
 
 
 #user defined function definitions
 def case_compare(data,attribute,value,concept,decision):
 	flag = 0
 	
+
 	global complete_classified_correct, complete_classified_incorrect, classified_not
-	#complete_classified_correct = [] #to store the cases that have been correctly classified
-	#complete_classified_incorrect = [] #to store the cases that have been incorrectly classified
-	#classified_not = [] #to store the cases that have not been classified
+	
 	row = data.shape[0]
 	column = data.shape[1]
 	len1 = len(attribute)
@@ -20,6 +20,8 @@ def case_compare(data,attribute,value,concept,decision):
 	headerlist = list(data.columns.values) #to get the headers of the table
 	header_list_length = len(headerlist) #length of the headerlist
 	
+	
+
 	#checking each case if being matched by the rule completely
 	for index, row in data.iterrows():
 		
@@ -56,8 +58,6 @@ def case_compare(data,attribute,value,concept,decision):
 		else:
 			classified_not.append(index-2)
 	
-
-		
 
 	#-----print the list of cases---------		
 		
@@ -130,7 +130,7 @@ for i in range(0,colnum_old-1):
 
 data.dropna(axis=1, how='any',inplace=True) #drop all the columns having any NaN values
 
-#print(data)
+
 rownum = data.shape[0] #No. of Rows in the dataframe
 colnum = data.shape[1] #No. of Columns in the dataframe
 
@@ -158,15 +158,13 @@ for x in lines:
 			x = x+l2
 			
 			rulesep = x.split("->") #rulesep array's first location contains the left side of the Rule and second location contains the right side
-			#print(rulesep)
+		
 
-			#rule_left.append(rulesep[0]) #updating the Left side of the rules
-			#rule_right.append(rulesep[1]) #updating the Right side of the rules
 
 		elif("->" in x):
 
 			rulesep = x.split("->") #rulesep array's first location contains the left side of the Rule and second location contains the right side
-			#print(rulesep)
+		
 
 		rule_left.append(rulesep[0]) #updating the Left side of the rules
 		rule_right.append(rulesep[1]) #updating the Right side of the rules
@@ -201,7 +199,7 @@ for x in lines:
 			
 		
 		#call the function for checking cases
-		#print("\n\nCases matched: ")
+		
 		case_compare(data,attribute,value,concept,decision)
 		
 		rule_left = [] #list to store the left parts of the Rules
@@ -221,12 +219,12 @@ complete_classified_correct_nodup = list(set(complete_classified_correct))
 complete_classified_incorrect_nodup = list(set(complete_classified_incorrect))
 
 response_match_factor = input('Do you want to use the Matching Factor (y/n): ')
-response_strenfth_prob = input('Do you want to use Strength (s) or Conditional PRobability (p): ')
+response_strength_prob = input('Do you want to use Strength (s) or Conditional Probability (p): ')
 response_specificity = input('Do you want to use the factor associated with Specificity (y/n): ')
 response_support = input('Do you want to use the support of other rules or not (y/n): ')
 response_concept_stat = input('Do you want to know the Concept Statistics (y/n): ')
 response_classified = input('Do you want to know how Cases associated with Concepts are Classified (y/n): ')
-
+#print(data.iloc[:,colnum-1])
 #printing statements
 print("\n\n-----------!!! General Statistics !!!-------------")
 print("\n\n----This report was created from the Rule file", rname, "and from the Data file", fname, "----")
@@ -239,6 +237,49 @@ print("\n\nCOMPLETE MATCHING: ")
 print("\nThe total number of cases that are incorrectly classified: ", len(complete_classified_incorrect_nodup))
 print("\nThe total number of cases that are correctly classified: ", len(complete_classified_correct_nodup))
 
-#print("Specificity: ", specificity)
-#print("Strength: ", strength)
-#print("Number of matching Training cases: ", matchcase)
+decision_list = data.iloc[:,colnum-1].unique()
+decision_list = decision_list[1:]
+
+
+if(response_concept_stat is 'y' or response_concept_stat is 'Y'):
+	print("\n\n-----------!!! Concept Statistics !!!-------------")
+	for item in decision_list:
+		incorr = 0
+		corr = 0
+		print("\n\nConcept(",data.iloc[0,colnum-1], item, ")" )
+		print("\nThe total number of cases that are NOT classified: ", len(classified_not))
+		print("\nCOMPLETE MATCHING: ")
+		for j in complete_classified_incorrect_nodup:
+			if data.iloc[j+1,colnum-1] is item:
+				incorr = incorr + 1
+		print("\nThe total number of cases that are incorrectly classified: ", incorr)
+		for j in complete_classified_correct_nodup:
+			if data.iloc[j+1,colnum-1] is item:
+				corr = corr + 1
+		print("\nThe total number of cases that are correctly classified: ", corr)
+
+
+if(response_classified is 'y' or response_classified is 'Y'):
+	print("\n\n-----------!!! Classification of Cases associated with Concepts !!!-------------")
+	for item in decision_list:
+		incorr = 0
+		corr = 0
+		print("\n\nConcept(",data.iloc[0,colnum-1], item, ")" )
+		print("\nThe total number of cases that are NOT classified: ", len(classified_not))
+		print("\nCOMPLETE MATCHING: ")
+		print("\nList of cases that are Incorrectly classified: ")
+		for j in complete_classified_incorrect_nodup:
+			if data.iloc[j+1,colnum-1] is item:
+				for j in complete_classified_correct_nodup:
+					for k in range(0,colnum):
+						print(data.iloc[j,k], end=' , ')
+				print("\n")
+		
+		print("\nList of cases that are Correctly classified: ")
+		for j in complete_classified_correct_nodup:
+			if data.iloc[j+1,colnum-1] is item:
+				for j in complete_classified_correct_nodup:
+					for k in range(0,colnum):
+						print(data.iloc[j,k], end=' , ')
+				print("\n")
+		
